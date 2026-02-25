@@ -1,0 +1,37 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+.venv
+ENV/
+env.bak/
+venv.bak/
+pythonenv.*
+
+# 输出文件
+outputs/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.mp4
+*.avi
+
+
+# 其他
+.DS_Store
+Thumbs.db
+*.log
+*.tmp

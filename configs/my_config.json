@@ -1,0 +1,183 @@
+{
+  "color_warning": [
+    255,
+    50,
+    50,
+    255
+  ],
+  "color_error_text": [
+    255,
+    50,
+    50,
+    255
+  ],
+  "color_normal_text": [
+    255,
+    255,
+    255,
+    255
+  ],
+  "color_border": [
+    255,
+    255,
+    255,
+    255
+  ],
+  "color_line": [
+    255,
+    255,
+    255,
+    255
+  ],
+  "color_float": [
+    255,
+    255,
+    255,
+    255
+  ],
+  "mesh_color": [
+    255,
+    255,
+    255,
+    255
+  ],
+  "mesh_complexity": 220,
+  "line_connect_chance": 0.18,
+  "nerve_mutation_chance": 0.25,
+  "log_blocks_range": [
+    9,
+    25
+  ],
+  "log_lines_per_block": [
+    2,
+    3
+  ],
+  "node_text_chance": 0.25,
+  "hex_dump_areas": 8,
+  "title_erosion_rate": 0.33,
+  "fatal_error_count": [
+    4,
+    6
+  ],
+  "hud_line_chance": 0.75,
+  "rgb_shift_max": 3.0,
+  "scanline_darkness": 0.88,
+  "style_weights": {
+    "staircase": 4,
+    "torn": 5,
+    "jitter": 2,
+    "normal": 1
+  },
+  "torn_trigger_chance": 0.6,
+  "torn_offset_x": [
+    60,
+    150
+  ],
+  "torn_offset_y": [
+    -10,
+    20
+  ],
+  "staircase_step": [
+    10,
+    30
+  ],
+  "box_count": [
+    18,
+    44
+  ],
+  "box_size_range": [
+    40,
+    150
+  ],
+  "box_border_thickness": 1,
+  "box_line_connect_chance": 1.0,
+  "box_line_max_distance": 210,
+  "box_line_thickness": 1,
+  "box_line_color": [
+    255,
+    255,
+    255,
+    180
+  ],
+  "box_line_jitter_chance": 0.3,
+  "box_line_jitter_amount": 15,
+  "box_float_display": true,
+  "box_float_range": [
+    -999.999,
+    999.999
+  ],
+  "box_float_precision": 5,
+  "box_type_weights": {
+    "plain": 3,
+    "invert": 2,
+    "bios": 4,
+    "space_warp": 6
+  },
+  "bios_title_bar_height": 16,
+  "bios_title_formats": [
+    "[BIOS]",
+    "[SETUP]",
+    "[POST]",
+    "[CMOS]",
+    "[ROM]",
+    "[ERR]",
+    "[WARN]",
+    "[INFO]",
+    "[FATAL]",
+    "[PANIC]"
+  ],
+  "invert_chance": 1.0,
+  "warp_intensity": 0.7,
+  "warp_segments": 7,
+  "warp_glitch_chance": 0.8,
+  "warp_shift_range": [
+    5,
+    20
+  ],
+  "warp_color_shift": true,
+  "warp_scanline_jitter": true,
+  "use_extended_errors": true,
+  "error_categories": [
+    "fatal",
+    "hash",
+    "key",
+    "auth",
+    "network",
+    "hardware",
+    "filesystem",
+    "database",
+    "security",
+    "crypto",
+    "runtime",
+    "driver",
+    "monitoring",
+    "ml",
+    "stack"
+  ],
+  "error_weights": {
+    "fatal": 1,
+    "hash": 1,
+    "key": 1,
+    "auth": 1,
+    "network": 1,
+    "hardware": 1,
+    "filesystem": 1,
+    "database": 1,
+    "security": 1,
+    "crypto": 1,
+    "runtime": 1,
+    "driver": 1,
+    "monitoring": 1,
+    "ml": 2,
+    "stack": 2
+  },
+  "enable_depth_of_field": false,
+  "depth_focus_center": [
+    0.5,
+    0.5
+  ],
+  "depth_focus_radius": 0.3,
+  "depth_blur_amount": 1.5,
+  "depth_darken_amount": 0.7,
+  "depth_fade_start": 0.2
+}
