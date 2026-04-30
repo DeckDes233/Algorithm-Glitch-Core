@@ -41,7 +41,7 @@ AlgorithmGlitchCore 诞生于对 AlgorithmHellYeahCore 与 Glitch Core 的探索
 
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/AlgorithmGlitchCore.git
+git clone https://github.com/DeckDes233/AlgorithmGlitchCore.git
 cd AlgorithmGlitchCore
 
 # 安装依赖
