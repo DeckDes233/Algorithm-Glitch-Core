@@ -128,7 +128,21 @@ class CyberConfig:
         'ml': 2, 'stack': 2
     })
 
-    # 10. 景深效果
+    # 10. 噪声效果
+    enable_noise: bool = True
+    noise_perlin_scale: float = 80.0
+    noise_perlin_octaves: int = 4
+    noise_perlin_intensity: float = 30.0
+    noise_rgb_separate: bool = True
+    noise_rgb_r_intensity: float = 35.0
+    noise_rgb_g_intensity: float = 25.0
+    noise_rgb_b_intensity: float = 30.0
+    noise_scanline_enabled: bool = True
+    noise_scanline_intensity: float = 20.0
+    noise_scanline_frequency: float = 0.5
+    noise_strength: float = 1.0
+
+    # 11. 景深效果
     enable_depth_of_field: bool = True
     depth_focus_center: Tuple[float, float] = (0.5, 0.5)
     depth_focus_radius: float = 0.3

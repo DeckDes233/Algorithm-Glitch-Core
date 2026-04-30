@@ -45,6 +45,7 @@ def create_config_tab(config_state):
     color_inputs = create_color_config()
     box_inputs = create_box_config()
     warp_inputs = create_warp_config()
+    noise_inputs = create_noise_config()
     text_inputs = create_text_config()
     dof_inputs = create_dof_config()
     error_inputs = create_error_config()
@@ -54,6 +55,7 @@ def create_config_tab(config_state):
     all_inputs.update(color_inputs)
     all_inputs.update(box_inputs)
     all_inputs.update(warp_inputs)
+    all_inputs.update(noise_inputs)
     all_inputs.update(text_inputs)
     all_inputs.update(dof_inputs)
     all_inputs.update(error_inputs)
@@ -300,6 +302,73 @@ def create_warp_config() -> Dict[str, gr.Component]:
     return inputs
 
 
+def create_noise_config() -> Dict[str, gr.Component]:
+    """创建噪声效果配置UI"""
+    inputs = {}
+
+    with gr.TabItem("🌊 噪声效果"):
+        with gr.Row():
+            with gr.Column():
+                gr.Markdown("#### Perlin噪声")
+                inputs['enable_noise'] = gr.Checkbox(
+                    value=True, label="启用噪声效果"
+                )
+                inputs['noise_perlin_scale'] = gr.Slider(
+                    minimum=10, maximum=200, value=80, step=5,
+                    label="Perlin缩放", info="值越大纹理越细腻"
+                )
+                inputs['noise_perlin_octaves'] = gr.Slider(
+                    minimum=1, maximum=8, value=4, step=1,
+                    label="Perlin八度", info="细节层次数"
+                )
+                inputs['noise_perlin_intensity'] = gr.Slider(
+                    minimum=0, maximum=80, value=30, step=1,
+                    label="Perlin强度"
+                )
+
+            with gr.Column():
+                gr.Markdown("#### RGB通道独立噪声")
+                inputs['noise_rgb_separate'] = gr.Checkbox(
+                    value=True, label="启用RGB独立噪声"
+                )
+                inputs['noise_rgb_r_intensity'] = gr.Slider(
+                    minimum=0, maximum=80, value=35, step=1,
+                    label="红色通道强度"
+                )
+                inputs['noise_rgb_g_intensity'] = gr.Slider(
+                    minimum=0, maximum=80, value=25, step=1,
+                    label="绿色通道强度"
+                )
+                inputs['noise_rgb_b_intensity'] = gr.Slider(
+                    minimum=0, maximum=80, value=30, step=1,
+                    label="蓝色通道强度"
+                )
+
+        with gr.Row():
+            with gr.Column():
+                gr.Markdown("#### 扫描线噪声")
+                inputs['noise_scanline_enabled'] = gr.Checkbox(
+                    value=True, label="启用扫描线噪声"
+                )
+                inputs['noise_scanline_intensity'] = gr.Slider(
+                    minimum=0, maximum=60, value=20, step=1,
+                    label="扫描线强度"
+                )
+                inputs['noise_scanline_frequency'] = gr.Slider(
+                    minimum=0.1, maximum=3.0, value=0.5, step=0.1,
+                    label="扫描线频率"
+                )
+
+            with gr.Column():
+                gr.Markdown("#### 全局控制")
+                inputs['noise_strength'] = gr.Slider(
+                    minimum=0, maximum=2.0, value=1.0, step=0.05,
+                    label="噪声总强度", info="统一缩放所有噪声效果"
+                )
+
+    return inputs
+
+
 def create_text_config() -> Dict[str, gr.Component]:
     """创建文字配置UI"""
     inputs = {}
@@ -466,6 +535,20 @@ def config_to_ui_values(config: CyberConfig) -> list:
     values.append(1 if config.warp_color_shift else 0)
     values.append(1 if config.warp_scanline_jitter else 0)
 
+    # 噪声效果
+    values.append(1 if config.enable_noise else 0)
+    values.append(config.noise_perlin_scale)
+    values.append(config.noise_perlin_octaves)
+    values.append(config.noise_perlin_intensity)
+    values.append(1 if config.noise_rgb_separate else 0)
+    values.append(config.noise_rgb_r_intensity)
+    values.append(config.noise_rgb_g_intensity)
+    values.append(config.noise_rgb_b_intensity)
+    values.append(1 if config.noise_scanline_enabled else 0)
+    values.append(config.noise_scanline_intensity)
+    values.append(config.noise_scanline_frequency)
+    values.append(config.noise_strength)
+
     # 文字配置
     values.append(config.title_erosion_rate)
     values.append(config.node_text_chance)
@@ -531,7 +614,8 @@ def update_config_from_input(config: CyberConfig, input_name: str, input_value) 
 
     # 复选框处理
     elif input_name in ['box_float_display', 'warp_color_shift', 'warp_scanline_jitter',
-                        'enable_depth_of_field', 'use_extended_errors']:
+                        'enable_depth_of_field', 'use_extended_errors',
+                        'enable_noise', 'noise_rgb_separate', 'noise_scanline_enabled']:
         setattr(config, input_name, bool(input_value))
 
     # 其他直接映射的属性

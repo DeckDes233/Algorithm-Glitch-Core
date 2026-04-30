@@ -13,6 +13,159 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 
+def _fade(t):
+    """Perlin噪声的缓和曲线 6t^5 - 15t^4 + 10t^3"""
+    return t * t * t * (t * (t * 6 - 15) + 10)
+
+
+def _lerp(a, b, t):
+    """线性插值"""
+    return a + t * (b - a)
+
+
+def _grad_2d(hash_val, x, y):
+    """二维梯度向量点积"""
+    h = hash_val & 3
+    if h == 0:
+        return x + y
+    elif h == 1:
+        return -x + y
+    elif h == 2:
+        return x - y
+    else:
+        return -x - y
+
+
+def _generate_permutation(seed):
+    """生成Perlin噪声的排列表"""
+    rng = np.random.RandomState(seed)
+    p = np.arange(256, dtype=int)
+    rng.shuffle(p)
+    return np.concatenate([p, p])
+
+
+def _perlin_noise_2d(x, y, perm):
+    """计算单个点的二维Perlin噪声值, 返回[-1, 1]"""
+    xi = int(np.floor(x)) & 255
+    yi = int(np.floor(y)) & 255
+    xf = x - np.floor(x)
+    yf = y - np.floor(y)
+
+    u = _fade(xf)
+    v = _fade(yf)
+
+    aa = perm[perm[xi] + yi]
+    ab = perm[perm[xi] + yi + 1]
+    ba = perm[perm[xi + 1] + yi]
+    bb = perm[perm[xi + 1] + yi + 1]
+
+    x1 = _lerp(_grad_2d(aa, xf, yf), _grad_2d(ba, xf - 1, yf), u)
+    x2 = _lerp(_grad_2d(ab, xf, yf - 1), _grad_2d(bb, xf - 1, yf - 1), u)
+
+    return _lerp(x1, x2, v)
+
+
+def _perlin_noise_2d_array(h, w, scale, octaves, seed):
+    """生成二维Perlin噪声数组, 返回[h, w]的float64数组, 范围[-1, 1]"""
+    perm = _generate_permutation(seed)
+
+    noise = np.zeros((h, w), dtype=np.float64)
+    amplitude = 1.0
+    frequency = 1.0
+    max_amplitude = 0.0
+
+    for _ in range(octaves):
+        # 向量化计算坐标
+        xs = np.arange(w, dtype=np.float64) * frequency / scale
+        ys = np.arange(h, dtype=np.float64) * frequency / scale
+        xv, yv = np.meshgrid(xs, ys)
+
+        # 逐像素计算(用向量化没法完全避免循环, 但numpy广播加速)
+        octave_noise = np.zeros((h, w), dtype=np.float64)
+        for yi in range(h):
+            for xi in range(w):
+                octave_noise[yi, xi] = _perlin_noise_2d(xv[yi, xi], yv[yi, xi], perm)
+
+        noise += octave_noise * amplitude
+        max_amplitude += amplitude
+        amplitude *= 0.5
+        frequency *= 2.0
+
+    noise /= max_amplitude
+    return noise
+
+
+def apply_perlin_noise(core, img):
+    """应用Perlin噪声 - 模拟胶片颗粒和自然纹理"""
+    h, w = img.shape[:2]
+    intensity = core.cfg.noise_perlin_intensity * core.cfg.noise_strength
+
+    noise = _perlin_noise_2d_array(
+        h, w,
+        scale=core.cfg.noise_perlin_scale,
+        octaves=core.cfg.noise_perlin_octaves,
+        seed=core.seed
+    )
+
+    # 将噪声映射到[-intensity, intensity]
+    noise_map = (noise * intensity).astype(np.float64)
+
+    # 应用到图像
+    result = img.astype(np.float64)
+    for c in range(3):
+        result[:, :, c] += noise_map
+
+    return np.clip(result, 0, 255).astype(np.uint8)
+
+
+def apply_rgb_noise(core, img):
+    """RGB通道独立噪声 - 三个通道分别添加不同程度噪声"""
+    h, w = img.shape[:2]
+    strength = core.cfg.noise_strength
+    intensities = [
+        core.cfg.noise_rgb_r_intensity * strength,
+        core.cfg.noise_rgb_g_intensity * strength,
+        core.cfg.noise_rgb_b_intensity * strength,
+    ]
+
+    result = img.astype(np.float64)
+    for c in range(3):
+        noise = _perlin_noise_2d_array(
+            h, w,
+            scale=core.cfg.noise_perlin_scale * 1.2,
+            octaves=max(2, core.cfg.noise_perlin_octaves - 1),
+            seed=core.seed + c * 100
+        )
+        result[:, :, c] += noise * intensities[c]
+
+    return np.clip(result, 0, 255).astype(np.uint8)
+
+
+def apply_scanline_noise(core, img):
+    """扫描线噪声 - 模拟老式电视扫描线干扰"""
+    h, w = img.shape[:2]
+    intensity = core.cfg.noise_scanline_intensity * core.cfg.noise_strength
+    freq = core.cfg.noise_scanline_frequency
+
+    result = img.astype(np.float64)
+
+    # 每条扫描线施加随机偏移
+    rng = np.random.RandomState(core.seed + 777)
+    for y in range(0, h, 2):
+        # 扫描线基础亮度调制: 正弦波 + 随机抖动
+        sine_val = np.sin(2.0 * np.pi * freq * y / h)
+        jitter = rng.uniform(-0.3, 0.3)
+        line_intensity = intensity * (0.5 + 0.5 * sine_val + jitter)
+
+        # 偶数行稍微变暗, 模拟CRT扫描线
+        if y % 2 == 0:
+            result[y, :, :] -= line_intensity * 0.6
+        else:
+            result[y, :, :] += line_intensity * 0.2
+
+    return np.clip(result, 0, 255).astype(np.uint8)
+
+
 def apply_crt_effects(core, img):
     """应用CRT屏幕效果"""
     h, w = img.shape[:2]

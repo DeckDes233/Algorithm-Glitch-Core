@@ -11,7 +11,7 @@ import time
 import math
 
 from config import CyberConfig
-from core.effects import apply_crt_effects, apply_depth_of_field
+from core.effects import apply_crt_effects, apply_depth_of_field, apply_perlin_noise, apply_rgb_noise, apply_scanline_noise
 from core.boxes import draw_boxes
 from core.text import draw_chaotic_text
 from core.utils import detect_subject, draw_sparse_wireframe
@@ -159,6 +159,17 @@ class ConfigurableCyberCore:
 
         # 应用CRT效果
         self.canvas = apply_crt_effects(self, self.canvas)
+
+        # 应用噪声效果
+        if self.cfg.enable_noise:
+            self.log_debug("应用Perlin噪声...")
+            self.canvas = apply_perlin_noise(self, self.canvas)
+            if self.cfg.noise_rgb_separate:
+                self.log_debug("应用RGB通道独立噪声...")
+                self.canvas = apply_rgb_noise(self, self.canvas)
+            if self.cfg.noise_scanline_enabled:
+                self.log_debug("应用扫描线噪声...")
+                self.canvas = apply_scanline_noise(self, self.canvas)
 
         # 确保图像不是全白
         if np.mean(self.canvas) > 250:

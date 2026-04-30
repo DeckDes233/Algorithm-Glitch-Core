@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 
 from core.renderer import ConfigurableCyberCore
-from core.effects import apply_crt_effects, apply_depth_of_field, apply_space_warp
+from core.effects import apply_crt_effects, apply_depth_of_field, apply_space_warp, apply_perlin_noise, apply_rgb_noise, apply_scanline_noise
 from core.boxes import draw_boxes
 from core.text import draw_chaotic_text
 from core.utils import (
@@ -19,6 +19,9 @@ __all__ = [
     'apply_crt_effects',
     'apply_depth_of_field',
     'apply_space_warp',
+    'apply_perlin_noise',
+    'apply_rgb_noise',
+    'apply_scanline_noise',
     'draw_boxes',
     'draw_chaotic_text',
     'detect_subject',
